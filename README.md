@@ -1,25 +1,14 @@
-# spells-goerli
+# spells-apothem
 
-![Build Status](https://github.com/makerdao/spells-goerli/actions/workflows/.github/workflows/tests.yaml/badge.svg?branch=master)
-
-Staging repo for MakerDAO's Goerli executive spells.
+Staging repo for Xinfin USX Apothem executive spells.
 
 ## Instructions
 
 ### Getting Started
 
 ```bash
-$ git clone git@github.com:makerdao/spells-goerli.git
 $ dapp update
 ```
-
-### Adding Collaterals to the System
-
-If the weekly executive needs to onboard a new collateral:
-
-1. Update the `onboardNewCollaterals()` function in `DssSpellCollateralOnboarding.sol`.
-2. Update the values in `src/tests/collaterals.sol`
-3. uncomment the `onboardNewCollaterals();` in the `actions()` function in `DssSpellAction`
 
 ### Build
 
@@ -27,37 +16,35 @@ If the weekly executive needs to onboard a new collateral:
 $ make
 ```
 
-### Test (DappTools with Optimizations)
+## Adjustments
 
-Set `ETH_RPC_URL` to a Goerli node.
-
-```bash
-$ export ETH_RPC_URL=<Goerli URL>
-$ make test
-```
-
-### Test (Forge without Optimizations)
-
-#### Prerequisites
-1. [Install](https://www.rust-lang.org/tools/install) Rust.
-2. [Install](https://github.com/gakonst/foundry#forge) Forge.
-
-#### Operation
-Set `ETH_RPC_URL` to a Goerli node.
+Modify:
 
 ```
-$ export ETH_RPC_URL=<Goerli URL>
-$ make test-forge
-```
+diff --git a/src/DssExec.sol b/src/DssExec.sol
+index 47be9f5..92a0f38 100644
+--- a/src/DssExec.sol
++++ b/src/DssExec.sol
+@@ -37,7 +37,7 @@ interface SpellAction {
 
-### Deploy
+ contract DssExec {
 
-Set `ETH_RPC_URL` to a Goerli node and ensure `ETH_GAS` is set to a high enough number to deploy the contract.
+-    Changelog      constant public log   = Changelog(0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F);
++    Changelog      constant public log  = Changelog(0x13C7235ABF6Fc803752DAbc564DF99524CE2dfAF);
+     uint256                 public eta;
+     bytes                   public sig;
+     bool                    public done;
+diff --git a/src/DssExecLib.sol b/src/DssExecLib.sol
+index a54024e..c324cba 100644
+--- a/src/DssExecLib.sol
++++ b/src/DssExecLib.sol
+@@ -136,7 +136,7 @@ library DssExecLib {
+     /*****************/
+     /*** Constants ***/
+     /*****************/
+-    address constant public LOG = 0xdA0Ab1e0017DEbCd72Be8599041a2aa3bA7e740F;
++    address constant public LOG = 0x13C7235ABF6Fc803752DAbc564DF99524CE2dfAF;
 
-```bash
-$ export ETH_RPC_URL=<Goerli URL>
-$ export ETH_GAS=8000000
-$ export ETH_GAS_PRICE=$(seth --to-wei 3 "gwei")
-$ make deploy
-
+     uint256 constant internal WAD      = 10 ** 18;
+     uint256 constant internal RAY      = 10 ** 27;
 ```

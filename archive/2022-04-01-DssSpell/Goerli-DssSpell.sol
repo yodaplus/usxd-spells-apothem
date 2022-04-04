@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+//
 // Copyright (C) 2021 Dai Foundation
 //
 // This program is free software: you can redistribute it and/or modify
@@ -15,29 +16,43 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
+import "dss-interfaces/dss/StairstepExponentialDecreaseAbstract.sol";
 
 contract DssSpellAction is DssAction {
-
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO -q -O - 2>/dev/null)"
-    string public constant override description = "Goerli Spell";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/287beee2bb76636b8b9e02c7e698fa639cb6b859/governance/votes/Executive%20vote%20-%20October%2022%2C%202021.md -q -O - 2>/dev/null)"
+    string public constant override description = "Apothem Spell";
 
-    address constant JOIN_FAB = 0x0aaA1E0f026c194E0F951a7763F9edc796c6eDeE;
-    address constant LERP_FAB = 0xE7988B75a19D8690272D65882Ab0D07D492f7002;
+    function officeHours() public override returns (bool) {
+        return false;
+    }
 
     function actions() public override {
+        DssExecLib.setStairstepExponentialDecrease(
+            0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2,
+            70,
+            9970
+        );
 
-        // Add Join factory to ChainLog
-        DssExecLib.setChangelogAddress("JOIN_FAB", JOIN_FAB);
+        DssExecLib.setStartingPriceMultiplicativeFactor(
+            bytes32("XDC-A"),
+            10500
+        );
 
-        // Update Lerp factory in ChainLog
-        DssExecLib.setChangelogAddress("LERP_FAB", LERP_FAB);
+        DssExecLib.setAuctionTimeBeforeReset(
+            bytes32("XDC-A"),
+            3592
+        );
 
-        DssExecLib.setChangelogVersion("1.9.9");
+        DssExecLib.setAuctionPermittedDrop(
+            bytes32("XDC-A"),
+            8571
+        );
     }
 }
 

@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+//
 // Copyright (C) 2021 Dai Foundation
 //
 // This program is free software: you can redistribute it and/or modify
@@ -15,47 +16,24 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pragma solidity 0.6.12;
+pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-
-// interface DssVestLike {
-//     function create(address, uint256, uint256, uint256, uint256, address) external returns (uint256);
-//     function restrict(uint256) external;
-// }
+import "dss-interfaces/dapp/DSAuthorityAbstract.sol";
 
 contract DssSpellAction is DssAction {
-
     // Provides a descriptive tag for bot consumption
     // This should be modified weekly to provide a summary of the actions
-    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/TODO -q -O - 2>/dev/null)"
-    string public constant override description = "Goerli Spell";
+    // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/287beee2bb76636b8b9e02c7e698fa639cb6b859/governance/votes/Executive%20vote%20-%20October%2022%2C%202021.md -q -O - 2>/dev/null)"
+    string public constant override description = "Apothem Spell";
 
-    // Turn on office hours
     function officeHours() public override returns (bool) {
-        return true;
+        return false;
     }
 
     function actions() public override {
-        address MCD_CLIP_USDT_A = DssExecLib.getChangelogAddress("MCD_CLIP_USDT_A");
-
-        // Offboard USDT-A
-        // https://vote.makerdao.com/polling/QmRNwrTy?network=mainnet#vote-breakdown
-
-        // 15 thousand DAI maximum liquidation amount
-        DssExecLib.setIlkMaxLiquidationAmount("USDT-A", 15_000);
-
-        // flip breaker to enable liquidations
-        DssExecLib.setValue(MCD_CLIP_USDT_A, "stopped", 0);
-
-        // authorize breaker
-        DssExecLib.authorize(MCD_CLIP_USDT_A, DssExecLib.clipperMom());
-
-        // set liquidation ratio to 300%
-        DssExecLib.setIlkLiquidationRatio("USDT-A", 30000);
-
-        // remove liquidation penalty
-        DssExecLib.setIlkLiquidationPenalty("USDT-A", 0);
+        DSAuthAbstract(0x6911b072DC16Dcc5B55caB7a832cBfcfB3E45069).setOwner(0x3c2070a2E512dD97881Df8fa0Af8f9889872FCAd);
     }
 }
 
