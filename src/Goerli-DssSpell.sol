@@ -28,31 +28,74 @@ contract DssSpellAction is DssAction {
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/287beee2bb76636b8b9e02c7e698fa639cb6b859/governance/votes/Executive%20vote%20-%20October%2022%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description = "Apothem Spell";
 
+    uint256 constant MILLION = 10**6;
+
     function officeHours() public override returns (bool) {
         return false;
     }
 
     function actions() public override {
-        DssExecLib.setStairstepExponentialDecrease(
-            0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2,
-            70,
-            9970
-        );
+        DssExecLib.setIlkLiquidationRatio("XDC-A", 20000);
+        DssExecLib.setKeeperIncentiveFlatRate("XDC-A", 0);
+        DssExecLib.setKeeperIncentivePercent("XDC-A", 0);
 
-        DssExecLib.setStartingPriceMultiplicativeFactor(
-            bytes32("XDC-A"),
-            10500
-        );
+        DssExecLib.addNewCollateral(CollateralOpts({
+            ilk:                   "XDC-B",
+            gem:                   0x839fEb1A8897B0F134196Fd5Aee5a89B690A6E0A,
+            join:                  0xA6e383105CBc27cc2cd7A8102B10FA7CF08595F3,
+            clip:                  0x29934c960a3aB08ca41b20a3c0dE40da466b0cE8,
+            calc:                  0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2,
+            pip:                   0x6911b072DC16Dcc5B55caB7a832cBfcfB3E45069,
+            isLiquidatable:        true,
+            isOSM:                 false,
+            whitelistOSM:          false,
+            ilkDebtCeiling:        3 * MILLION,
+            minVaultAmount:        0,
+            maxLiquidationAmount:  3 * MILLION,
+            liquidationPenalty:    1300,        // 13% penalty fee
+            ilkStabilityFee:       1000000000627937192491029810, // 2%
+            startingPriceFactor:   10500,       // Auction price begins at 130% of oracle
+            breakerTolerance:      5000,        // Allows for a 50% hourly price drop before disabling liquidations
+            auctionDuration:       3592 seconds,
+            permittedDrop:         8571,        // 40% price drop before reset
+            liquidationRatio:      16000,       // 160% collateralization
+            kprFlatReward:         0,         // 300 Dai
+            kprPctReward:          0           // 0.1%
+        }));
+        DssExecLib.setIlkAutoLineParameters("XDC-B", 50 * MILLION, 3 * MILLION, 8 hours);
 
-        DssExecLib.setAuctionTimeBeforeReset(
-            bytes32("XDC-A"),
-            3592
-        );
+        DssExecLib.setChangelogAddress("MCD_JOIN_XDC_B", 0xA6e383105CBc27cc2cd7A8102B10FA7CF08595F3);
+        DssExecLib.setChangelogAddress("MCD_CLIP_XDC_B", 0x29934c960a3aB08ca41b20a3c0dE40da466b0cE8);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XDC_B", 0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2);
 
-        DssExecLib.setAuctionPermittedDrop(
-            bytes32("XDC-A"),
-            8571
-        );
+        DssExecLib.addNewCollateral(CollateralOpts({
+            ilk:                   "XDC-C",
+            gem:                   0x839fEb1A8897B0F134196Fd5Aee5a89B690A6E0A,
+            join:                  0x30637c3B9Efc4fDAC281Bc5C00A57C8d79c6C5AB,
+            clip:                  0xA00C76C26f1b245f86618e1B362C337701c3f186,
+            calc:                  0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2,
+            pip:                   0x6911b072DC16Dcc5B55caB7a832cBfcfB3E45069,
+            isLiquidatable:        true,
+            isOSM:                 false,
+            whitelistOSM:          false,
+            ilkDebtCeiling:        3 * MILLION,
+            minVaultAmount:        0,
+            maxLiquidationAmount:  3 * MILLION,
+            liquidationPenalty:    1300,        // 13% penalty fee
+            ilkStabilityFee:       1000000001547125957863212448, // 5%
+            startingPriceFactor:   10500,       // Auction price begins at 130% of oracle
+            breakerTolerance:      5000,        // Allows for a 50% hourly price drop before disabling liquidations
+            auctionDuration:       3592 seconds,
+            permittedDrop:         8571,        // 40% price drop before reset
+            liquidationRatio:      12000,       // 160% collateralization
+            kprFlatReward:         0,         // 300 Dai
+            kprPctReward:          0           // 0.1%
+        }));
+        DssExecLib.setIlkAutoLineParameters("XDC-C", 50 * MILLION, 3 * MILLION, 8 hours);
+
+        DssExecLib.setChangelogAddress("MCD_JOIN_XDC_C", 0x30637c3B9Efc4fDAC281Bc5C00A57C8d79c6C5AB);
+        DssExecLib.setChangelogAddress("MCD_CLIP_XDC_C", 0xA00C76C26f1b245f86618e1B362C337701c3f186);
+        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XDC_C", 0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2);
     }
 }
 
