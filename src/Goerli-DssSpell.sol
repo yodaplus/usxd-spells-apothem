@@ -20,7 +20,7 @@ pragma experimental ABIEncoderV2;
 
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
-import "dss-interfaces/dss/StairstepExponentialDecreaseAbstract.sol";
+import "dss-interfaces/dss/SpotAbstract.sol";
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
@@ -30,72 +30,31 @@ contract DssSpellAction is DssAction {
 
     uint256 constant MILLION = 10**6;
 
+    address constant PIP = 0x4e1955cCdE51fc1cF58757fdF114839de100837f;
+
     function officeHours() public override returns (bool) {
         return false;
     }
 
     function actions() public override {
-        DssExecLib.setIlkLiquidationRatio("XDC-A", 20000);
-        DssExecLib.setKeeperIncentiveFlatRate("XDC-A", 0);
-        DssExecLib.setKeeperIncentivePercent("XDC-A", 0);
+        address SPOT = DssExecLib.spotter();
 
-        DssExecLib.addNewCollateral(CollateralOpts({
-            ilk:                   "XDC-B",
-            gem:                   0x839fEb1A8897B0F134196Fd5Aee5a89B690A6E0A,
-            join:                  0xA6e383105CBc27cc2cd7A8102B10FA7CF08595F3,
-            clip:                  0x29934c960a3aB08ca41b20a3c0dE40da466b0cE8,
-            calc:                  0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2,
-            pip:                   0x6911b072DC16Dcc5B55caB7a832cBfcfB3E45069,
-            isLiquidatable:        true,
-            isOSM:                 false,
-            whitelistOSM:          false,
-            ilkDebtCeiling:        3 * MILLION,
-            minVaultAmount:        0,
-            maxLiquidationAmount:  3 * MILLION,
-            liquidationPenalty:    1300,        // 13% penalty fee
-            ilkStabilityFee:       1000000000627937192491029810, // 2%
-            startingPriceFactor:   10500,       // Auction price begins at 130% of oracle
-            breakerTolerance:      5000,        // Allows for a 50% hourly price drop before disabling liquidations
-            auctionDuration:       3592 seconds,
-            permittedDrop:         8571,        // 40% price drop before reset
-            liquidationRatio:      16000,       // 160% collateralization
-            kprFlatReward:         0,         // 300 Dai
-            kprPctReward:          0           // 0.1%
-        }));
-        DssExecLib.setIlkAutoLineParameters("XDC-B", 50 * MILLION, 3 * MILLION, 8 hours);
+        SpotAbstract(SPOT).file("XDC-A", "pip", PIP);
+        SpotAbstract(SPOT).file("XDC-B", "pip", PIP);
+        SpotAbstract(SPOT).file("XDC-C", "pip", PIP);
 
-        DssExecLib.setChangelogAddress("MCD_JOIN_XDC_B", 0xA6e383105CBc27cc2cd7A8102B10FA7CF08595F3);
-        DssExecLib.setChangelogAddress("MCD_CLIP_XDC_B", 0x29934c960a3aB08ca41b20a3c0dE40da466b0cE8);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XDC_B", 0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2);
+        DssExecLib.authorize(PIP, DssExecLib.osmMom());
 
-        DssExecLib.addNewCollateral(CollateralOpts({
-            ilk:                   "XDC-C",
-            gem:                   0x839fEb1A8897B0F134196Fd5Aee5a89B690A6E0A,
-            join:                  0x30637c3B9Efc4fDAC281Bc5C00A57C8d79c6C5AB,
-            clip:                  0xA00C76C26f1b245f86618e1B362C337701c3f186,
-            calc:                  0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2,
-            pip:                   0x6911b072DC16Dcc5B55caB7a832cBfcfB3E45069,
-            isLiquidatable:        true,
-            isOSM:                 false,
-            whitelistOSM:          false,
-            ilkDebtCeiling:        3 * MILLION,
-            minVaultAmount:        0,
-            maxLiquidationAmount:  3 * MILLION,
-            liquidationPenalty:    1300,        // 13% penalty fee
-            ilkStabilityFee:       1000000001547125957863212448, // 5%
-            startingPriceFactor:   10500,       // Auction price begins at 130% of oracle
-            breakerTolerance:      5000,        // Allows for a 50% hourly price drop before disabling liquidations
-            auctionDuration:       3592 seconds,
-            permittedDrop:         8571,        // 40% price drop before reset
-            liquidationRatio:      12000,       // 160% collateralization
-            kprFlatReward:         0,         // 300 Dai
-            kprPctReward:          0           // 0.1%
-        }));
-        DssExecLib.setIlkAutoLineParameters("XDC-C", 50 * MILLION, 3 * MILLION, 8 hours);
+        DssExecLib.addReaderToWhitelist(PIP, SPOT);
+        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.clip("XDC-A"));
+        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.clip("XDC-B"));
+        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.clip("XDC-C"));
+        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.clipperMom());
+        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.end());
 
-        DssExecLib.setChangelogAddress("MCD_JOIN_XDC_C", 0x30637c3B9Efc4fDAC281Bc5C00A57C8d79c6C5AB);
-        DssExecLib.setChangelogAddress("MCD_CLIP_XDC_C", 0xA00C76C26f1b245f86618e1B362C337701c3f186);
-        DssExecLib.setChangelogAddress("MCD_CLIP_CALC_XDC_C", 0x1c3e05F5f9dd1AC1D51be3D42845163B95f18BB2);
+        DssExecLib.allowOSMFreeze(PIP, "XDC-A");
+        DssExecLib.allowOSMFreeze(PIP, "XDC-B");
+        DssExecLib.allowOSMFreeze(PIP, "XDC-C");
     }
 }
 
