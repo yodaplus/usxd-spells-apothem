@@ -21,6 +21,7 @@ pragma experimental ABIEncoderV2;
 import "dss-exec-lib/DssExec.sol";
 import "dss-exec-lib/DssAction.sol";
 import "dss-interfaces/dss/SpotAbstract.sol";
+import "dss-interfaces/dss/OsmAbstract.sol";
 
 contract DssSpellAction is DssAction {
     // Provides a descriptive tag for bot consumption
@@ -31,30 +32,25 @@ contract DssSpellAction is DssAction {
     uint256 constant MILLION = 10**6;
 
     address constant PIP = 0x4e1955cCdE51fc1cF58757fdF114839de100837f;
+    address constant OLD_PAUSE_PROXY = 0x45B4efdda8d49502c0DdB16bF26c9D8784446681;
+    address constant NEW_PAUSE_PROXY = 0xCa0cFcf3066Fb463517a4819408FE9167F69fbDE;
 
     function officeHours() public override returns (bool) {
         return false;
     }
 
     function actions() public override {
-        address SPOT = DssExecLib.spotter();
+        DssExecLib.removeReaderFromWhitelist(PIP, DssExecLib.spotter());
+        DssExecLib.removeReaderFromWhitelist(PIP, DssExecLib.clip("XDC-A"));
+        DssExecLib.removeReaderFromWhitelist(PIP, DssExecLib.clip("XDC-B"));
+        DssExecLib.removeReaderFromWhitelist(PIP, DssExecLib.clip("XDC-C"));
+        DssExecLib.removeReaderFromWhitelist(PIP, DssExecLib.clipperMom());
+        DssExecLib.removeReaderFromWhitelist(PIP, DssExecLib.end());
 
-        SpotAbstract(SPOT).file("XDC-A", "pip", PIP);
-        SpotAbstract(SPOT).file("XDC-B", "pip", PIP);
-        SpotAbstract(SPOT).file("XDC-C", "pip", PIP);
+        DssExecLib.deauthorize(PIP, DssExecLib.osmMom());
 
-        DssExecLib.authorize(PIP, DssExecLib.osmMom());
-
-        DssExecLib.addReaderToWhitelist(PIP, SPOT);
-        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.clip("XDC-A"));
-        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.clip("XDC-B"));
-        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.clip("XDC-C"));
-        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.clipperMom());
-        DssExecLib.addReaderToWhitelist(PIP, DssExecLib.end());
-
-        DssExecLib.allowOSMFreeze(PIP, "XDC-A");
-        DssExecLib.allowOSMFreeze(PIP, "XDC-B");
-        DssExecLib.allowOSMFreeze(PIP, "XDC-C");
+        DssExecLib.authorize(PIP, NEW_PAUSE_PROXY);
+        DssExecLib.deauthorize(PIP, OLD_PAUSE_PROXY);
     }
 }
 
