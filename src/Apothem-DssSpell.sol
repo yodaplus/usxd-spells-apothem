@@ -28,16 +28,12 @@ contract DssSpellAction is DssAction {
     // Hash: seth keccak -- "$(wget https://raw.githubusercontent.com/makerdao/community/287beee2bb76636b8b9e02c7e698fa639cb6b859/governance/votes/Executive%20vote%20-%20October%2022%2C%202021.md -q -O - 2>/dev/null)"
     string public constant override description = "Apothem Spell";
 
-    uint256 constant MILLION = 10**6;
-
-    address constant PIP = 0x4e1955cCdE51fc1cF58757fdF114839de100837f;
-
     function officeHours() public override returns (bool) {
         return false;
     }
 
     function actions() public override {
-        DssExecLib.authorize(PIP, 0x3c2070a2E512dD97881Df8fa0Af8f9889872FCAd);
+        DssExecLib.setSurplusAuctionAmount(5);
     }
 }
 
