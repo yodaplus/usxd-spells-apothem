@@ -9,4 +9,5 @@
 	url = https://github.com/makerdao/dss-interfaces
 [submodule "lib/dss-exec-lib"]
 	path = lib/dss-exec-lib
-	url = https://github.com/makerdao/dss-exec-lib
+	url = https://github.com/yodaplus/xss-exec-lib.git
+	branch = apothem
